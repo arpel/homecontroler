@@ -3,6 +3,7 @@ cosm = require('cosm')
 client = new cosm.Cosm('bI-PWNeyFPrHnJOq7tclJGLVjDiSAKxOSlRJNVVYMTBnbz0g')
 feed = new cosm.Feed(cosm, {id: 97289})
 feedVBAT = new cosm.Feed(cosm, {id: 99851})
+feedPHOTO = new cosm.Feed(cosm, {id: 128691})
 stream2TEMP = new cosm.Datastream(client, feed, {id: 1, queue_size: 1})
 stream2VBAT = new cosm.Datastream(client, feedVBAT, {id: 2, queue_size: 1})
 stream3TEMP = new cosm.Datastream(client, feed, {id: 3, queue_size: 1})
@@ -14,6 +15,7 @@ stream6TEMP = new cosm.Datastream(client, feed, {id: 8, queue_size: 1})
 stream6VBAT = new cosm.Datastream(client, feedVBAT, {id: 6, queue_size: 1})
 stream7TEMP = new cosm.Datastream(client, feed, {id: 9, queue_size: 1})
 stream7VBAT = new cosm.Datastream(client, feedVBAT, {id: 7, queue_size: 1})
+stream7PHOTO = new cosm.Datastream(client, feedPHOTO, {id: 1, queue_size: 1})
 
 RF12demo = require('./serial-RF12demo.coffee')
 
@@ -76,12 +78,16 @@ rfm.on 'node-6', (packet) ->
    stream6TEMP.addPoint(ints[0]/100.0)
    stream6VBAT.addPoint(ints[1]/1000.0)
 
-rfm.on 'node-7', (packet) ->
+rfm.on 'node-17', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
    ints = (packet.buffer.readInt16LE(2*i) for i in [1..2])
+   numsensors = packet.buffer.readUInt8(6)
+   photocell =  packet.buffer.readUInt8(7)
    console.log "Sonde temperature 7 (Salon)",
       temp: ints[0]/100.0
       bat: ints[1]/1000.0
+      photocell: photocell / 1.0
    # Sending to COSM
    stream7TEMP.addPoint(ints[0]/100.0)
    stream7VBAT.addPoint(ints[1]/1000.0)
+   stream7PHOTO.addPoint(photocell / 1.0)
