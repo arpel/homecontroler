@@ -95,11 +95,12 @@ rfm.on 'node-17', (packet) ->
 rfm.on 'node-29', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
    ints = (packet.buffer.readInt16LE(2*i) for i in [1..2])
-   hchp_indexes = (packet.buffer.readUInt32LE(i) for i in [6, 10])
-   iinst = packet.buffer.readUInt16LE(14)
-   imax = packet.buffer.readUInt32LE(16)
-   papp = packet.buffer.readUInt32LE(20)
-   error = packet.buffer.readUInt8(24)
+   numsensors = packet.buffer.readUInt8(6)
+   hchp_indexes = (packet.buffer.readUInt32LE(i) for i in [7, 11])
+   iinst = packet.buffer.readUInt16LE(15)
+   imax = packet.buffer.readUInt32LE(17)
+   papp = packet.buffer.readUInt32LE(21)
+   error = packet.buffer.readUInt8(25)
 
    console.log "EDF TeleInfo",
       temp: ints[0]/100.0
@@ -111,5 +112,5 @@ rfm.on 'node-29', (packet) ->
       papp: papp
       error: error
    # Sending to COSM
-   stream6TEMP.addPoint(ints[0]/100.0)
-   stream6VBAT.addPoint(ints[1]/1000.0)
+   #stream6TEMP.addPoint(ints[0]/100.0)
+   #stream6VBAT.addPoint(ints[1]/1000.0)
