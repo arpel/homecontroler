@@ -91,3 +91,25 @@ rfm.on 'node-17', (packet) ->
    stream7TEMP.addPoint(ints[0]/100.0)
    stream7VBAT.addPoint(ints[1]/1000.0)
    stream7PHOTO.addPoint(photocell / 1.0)
+
+rfm.on 'node-29', (packet) ->
+   packetindex = packet.buffer.readUInt8(1)
+   ints = (packet.buffer.readInt16LE(2*i) for i in [1..2])
+   hchp_indexes = (packet.buffer.readInt32LE(i) for i in [6, 10])
+   iinst = packet.buffer.readInt16LE(14)
+   imax = packet.buffer.readInt32LE(16)
+   papp = packet.buffer.readInt32LE(20)
+   error = packet.buffer.readUInt8(24)
+
+   console.log "EDF TeleInfo",
+      temp: ints[0]/100.0
+      bat: ints[1]/1000.0
+      hchc: hchp_indexes[0]
+      hchp: hchp_indexes[1]
+      iinst: iinst
+      imax: imax
+      papp: papp
+      error: error
+   # Sending to COSM
+   stream6TEMP.addPoint(ints[0]/100.0)
+   stream6VBAT.addPoint(ints[1]/1000.0)
