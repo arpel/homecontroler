@@ -95,10 +95,10 @@ rfm.on 'node-17', (packet) ->
 rfm.on 'node-29', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
    ints = (packet.buffer.readInt16LE(2*i) for i in [1..2])
-   hchp_indexes = (packet.buffer.readInt32LE(i) for i in [6, 10])
-   iinst = packet.buffer.readInt16LE(14)
-   imax = packet.buffer.readInt32LE(16)
-   papp = packet.buffer.readInt32LE(20)
+   hchp_indexes = (packet.buffer.readUInt32LE(i) for i in [6, 10])
+   iinst = packet.buffer.readUInt16LE(14)
+   imax = packet.buffer.readUInt32LE(16)
+   papp = packet.buffer.readUInt32LE(20)
    error = packet.buffer.readUInt8(24)
 
    console.log "EDF TeleInfo",
