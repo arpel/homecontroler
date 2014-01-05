@@ -17,6 +17,13 @@ stream7TEMP = new cosm.Datastream(client, feed, {id: 9, queue_size: 1})
 stream7VBAT = new cosm.Datastream(client, feedVBAT, {id: 7, queue_size: 1})
 stream7PHOTO = new cosm.Datastream(client, feedPHOTO, {id: 1, queue_size: 1})
 
+
+feedEDFTeleInfo = new cosm.Feed(cosm, {id: 851244983})
+channelHCHC = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HC", queue_size: 1})
+channelHCHP = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HP", queue_size: 1})
+channelIInst = new cosm.Datastream(client, feedEDFTeleInfo, {id: "I_inst", queue_size: 1})
+channelPapp = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Papp", queue_size: 1})
+
 RF12demo = require('./serial-RF12demo.coffee')
 
 rfm = new RF12demo '/dev/ttyAMA0'
@@ -114,3 +121,8 @@ rfm.on 'node-29', (packet) ->
    # Sending to COSM
    #stream6TEMP.addPoint(ints[0]/100.0)
    #stream6VBAT.addPoint(ints[1]/1000.0)
+   
+   channelHCHC.addPoint(hchp_indexes[0])
+   channelHCHP.addPoint(hchp_indexes[1])
+   channelIInst.addPoint(iinst)
+   channelPapp.addPoint(papp)
