@@ -18,7 +18,7 @@ stream7VBAT = new cosm.Datastream(client, feedVBAT, {id: 7, queue_size: 1})
 stream7PHOTO = new cosm.Datastream(client, feedPHOTO, {id: 1, queue_size: 1})
 
 
-feedEDFTeleInfo = new cosm.Feed(cosm, {id: 851244983})
+feedEDFTeleInfo = new cosm.Feed(cosm, {id: 1384112203})
 channelHCHC = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HC", queue_size: 1})
 channelHCHP = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HP", queue_size: 1})
 channelIInst = new cosm.Datastream(client, feedEDFTeleInfo, {id: "I_inst", queue_size: 1})
