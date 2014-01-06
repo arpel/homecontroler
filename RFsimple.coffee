@@ -23,6 +23,7 @@ channelHCHC = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HC", queu
 channelHCHP = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HP", queue_size: 1})
 channelIInst = new cosm.Datastream(client, feedEDFTeleInfo, {id: "I_inst", queue_size: 1})
 channelPapp = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Papp", queue_size: 1})
+channelVbat = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Vbat", queue_size: 1})
 
 RF12demo = require('./serial-RF12demo.coffee')
 
@@ -118,11 +119,10 @@ rfm.on 'node-29', (packet) ->
       imax: imax
       papp: papp
       error: error
-   # Sending to COSM
-   #stream6TEMP.addPoint(ints[0]/100.0)
-   #stream6VBAT.addPoint(ints[1]/1000.0)
-   
+      
+   # Sending to Xively   
    channelHCHC.addPoint(hchp_indexes[0])
    channelHCHP.addPoint(hchp_indexes[1])
    channelIInst.addPoint(iinst)
    channelPapp.addPoint(papp)
+   channelVbat.addPoint(ints[1]/1000.0)
