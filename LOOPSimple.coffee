@@ -1,13 +1,12 @@
 cosm = require('cosm')
 
-client = new cosm.Cosm('bI-PWNeyFPrHnJOq7tclJGLVjDiSAKxOSlRJNVVYMTBnbz0g')
+client = new cosm.Cosm('WgyjfmBLavslYQ5iFjmWQ1FAlPvhTXNZCrNOXdUzvTj5qBYR')
 
-feedEDFTeleInfo = new cosm.Feed(cosm, {id: 1384112203})
-channelHCHC = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HC", queue_size: 1})
-channelHCHP = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Index_HP", queue_size: 1})
-channelIInst = new cosm.Datastream(client, feedEDFTeleInfo, {id: "I_inst", queue_size: 1})
+feedEDFTeleInfo = new cosm.Feed(cosm, {id: 549635376})
+channelHCHC = new cosm.Datastream(client, feedEDFTeleInfo, {id: "HCHC", queue_size: 1})
+channelHCHP = new cosm.Datastream(client, feedEDFTeleInfo, {id: "HCHP", queue_size: 1})
+channelIInst = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Iinst", queue_size: 1})
 channelPapp = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Papp", queue_size: 1})
-channelVbat = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Vbat", queue_size: 1})
 
 EDFLoopback = require('./serial-EDFLoopback.coffee')
 
@@ -16,29 +15,28 @@ edf = new EDFLoopback '/dev/ttyAMA0'
 httpcb = (error, response, body) ->
   console.log("HTTP Error") if error
 
-console.log 'Startup done'
+console.log 'EDF Loopback - Startup done'
 
 edf.on 'node-99', (packet) ->
-   packetindex = packet.buffer.readUInt8(1)
-   hchp_indexes = (packet.buffer.readUInt32LE(i) for i in [7, 11])
-   iinst = packet.buffer.readUInt16LE(15)
-   imax = packet.buffer.readUInt32LE(17)
-   papp = packet.buffer.readUInt32LE(21)
-   error = packet.buffer.readUInt8(25)
+   console.log "Incoming DATA",
+      packet: packet.buffer
+
+   packetindex = packet.buffer[0]
+   hchc = packet.buffer[1]
+   hchp = packet.buffer[2]
+   iinst = packet.buffer[3]
+   papp = packet.buffer[4]
+   error = packet.buffer[5]
 
    console.log "EDF TeleInfo",
-      temp: ints[0]/100.0
-      bat: ints[1]/1000.0
-      hchc: hchp_indexes[0]
-      hchp: hchp_indexes[1]
+      hchc: hchc
+      hchp: hchp
       iinst: iinst
-      imax: imax
       papp: papp
       error: error
       
    # Sending to Xively   
-   #channelHCHC.addPoint(hchp_indexes[0])
-   #channelHCHP.addPoint(hchp_indexes[1])
-   #channelIInst.addPoint(iinst)
-   #channelPapp.addPoint(papp)
-   #channelVbat.addPoint(ints[1]/1000.0)
+   channelHCHC.addPoint(hchc)
+   channelHCHP.addPoint(hchp)
+   channelIInst.addPoint(iinst)
+   channelPapp.addPoint(papp)

@@ -12,31 +12,29 @@ class EDFLoopback extends serialport.SerialPort
 
     @on 'data', (datain) =>
       data = datain
-      data = data.slice(1, -1) if data.slice(-1) == '\r'
+      data = data.slice(0, -1) if data.slice(-1) == '\r'
+      data = data.slice(0, -1) if data.slice(-1) == ' '
+      
       words = data.split ' '
-      console.log 'got DATA',
-        datain: datain
-        data: data
-        word: words
+      #console.log 'got DATA',
+      #  datain: datain
+      #  data: data
+      #  word: words
 
       tries = 3
      
       while tries--
-        if words.shift() == '99'
+        if words.shift() == '1'
           #console.log '  first is 1'
-	  #and @info.recvid
           ints = words.map (x) -> parseInt x
           head = ints.shift()
-          @info.id = head & 0x1F
+
+          @info.id = head
           @info.head = head
-          @info.buffer = new Buffer(ints) 
-          # TODO: conversion to ints can fail if the serial data is garbled
-          @info.id = words[0] & 0x1F
-          @info.buffer = new Buffer(words)
-          # generate new events, on generic channel and on node-specific one
+
+          @info.buffer = ints
           @emit 'packet', @info
           @emit "node-#{@info.id}", @info
-          #console.log 'correct at try '
           break
 
 module.exports = EDFLoopback
