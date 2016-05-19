@@ -25,6 +25,23 @@ channelIInst = new cosm.Datastream(client, feedEDFTeleInfo, {id: "I_inst", queue
 channelPapp = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Papp", queue_size: 1})
 channelVbat = new cosm.Datastream(client, feedEDFTeleInfo, {id: "Vbat", queue_size: 1})
 
+
+ThingSpeakClient = require('thingspeakclient');
+TS1client = new ThingSpeakClient({server:'http://thingspeak.jumptu.be', useTimeoutMode:false});
+# EDF TeleInfo
+TS1client.attachChannel(1, { writeKey: '4740UYKIJEBYRHLW'} );
+# Chaudiere
+TS1client.attachChannel(3, { writeKey: '5YECODMPU2IYDBUU'} );
+# Salon
+TS1client.attachChannel(4, { writeKey: 'QVBPRDBE0GDZIUQC'} );
+# Chambre
+TS1client.attachChannel(5, { writeKey: 'OLWT6VABNZYCCFWT'} );
+# Thermostat
+TS1client.attachChannel(6, { writeKey: 'PQG2AAFE2WGIE5T8'} );
+# Exterieur
+TS1client.attachChannel(7, { writeKey: '6KV88Q5JUG3UNAOM'} );
+
+
 RF12demo = require('./serial-RF12demo.coffee')
 
 rfm = new RF12demo '/dev/ttyAMA0'
@@ -46,6 +63,8 @@ rfm.on 'node-2', (packet) ->
    # Sending to COSM
    stream2TEMP.addPoint(ints[0]/100.0)
    stream2VBAT.addPoint(ints[1]/1000.0)
+   # Sending to Thingspeak
+   TS1client.updateChannel(6, { field1: ints[0]/100.0, field2: ints[1]/1000.0});
 
 rfm.on 'node-3', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
@@ -61,6 +80,8 @@ rfm.on 'node-3', (packet) ->
    # Sending to COSM
    stream3TEMP.addPoint(ints[0]/100.0)
    stream3VBAT.addPoint(ints[1]/1000.0)
+   # Sending to Thingspeak
+   TS1client.updateChannel(7, { field1: ints[0]/100.0, field2: ints[1]/1000.0});
 
 rfm.on 'node-10', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
@@ -75,6 +96,8 @@ rfm.on 'node-10', (packet) ->
    stream10TEMP1.addPoint(ints[0]/100.0)
    stream10TEMP2.addPoint(ints[2]/100.0)
    stream10VBAT.addPoint(ints[1]/1000.0)
+   # Sending to Thingspeak
+   TS1client.updateChannel(3, { field1: ints[0]/100.0, field2: ints[2]/100.0, field3: ints[1]/1000.0});
 
 rfm.on 'node-6', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
@@ -85,6 +108,8 @@ rfm.on 'node-6', (packet) ->
    # Sending to COSM
    stream6TEMP.addPoint(ints[0]/100.0)
    stream6VBAT.addPoint(ints[1]/1000.0)
+   # Sending to Thingspeak
+   TS1client.updateChannel(5, { field1: ints[0]/100.0, field2: ints[1]/1000.0});
 
 rfm.on 'node-17', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
@@ -99,6 +124,8 @@ rfm.on 'node-17', (packet) ->
    stream7TEMP.addPoint(ints[0]/100.0)
    stream7VBAT.addPoint(ints[1]/1000.0)
    stream7PHOTO.addPoint(photocell / 1.0)
+   # Sending to Thingspeak
+   TS1client.updateChannel(4, { field1: ints[0]/100.0, field2: photocell/1.0, field3: ints[1]/1000.0});
 
 rfm.on 'node-29', (packet) ->
    packetindex = packet.buffer.readUInt8(1)
@@ -126,3 +153,6 @@ rfm.on 'node-29', (packet) ->
    channelIInst.addPoint(iinst)
    channelPapp.addPoint(papp)
    channelVbat.addPoint(ints[1]/1000.0)
+   
+   # Sending to Thingspeak
+   TS1client.updateChannel(1, { field1: hchp_indexes[0], field2: hchp_indexes[1], field3: papp});
